@@ -33,8 +33,8 @@ class Form
 
         const std::string   getName() const;
         bool                getIsSigned() const;
-        const int           getSignGrade() const;
-        const int           getExecuteGrade() const;
+        int                 getSignGrade() const;
+        int                 getExecuteGrade() const;
         void                checkGrade(const int grade);
         void                beSigned(const Bureaucrat &b);
     

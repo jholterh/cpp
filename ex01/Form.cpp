@@ -35,6 +35,15 @@ Form::~Form()
     std::cout << "Destructor called" << std::endl;
 }
 
+std::ostream& operator<<(std::ostream& os, const Form& f)
+{
+    os << f.getName() << ", signed: " << std::boolalpha << f.getIsSigned()
+       << ", sign grade: " << f.getSignGrade()
+       << ", execute grade: " << f.getExecuteGrade();
+    return os;
+}
+
+
 const std::string Form::getName() const
 {
     return _name;
@@ -45,17 +54,20 @@ bool Form::getIsSigned() const
     return _isSigned;
 }
 
-const int Form::getSignGrade() const
+int Form::getSignGrade() const
 {
     return _signGrade;
 }
 
-const int Form::getExecuteGrade() const
+int Form::getExecuteGrade() const
 {
     return _executeGrade;
 }
 
 void Form::beSigned(const Bureaucrat &b)
 {
-    
+    if (b.getGrade() > _signGrade)
+        throw GradeTooLowException();
+    else
+        _isSigned = true;
 }
