@@ -71,7 +71,7 @@ void Bureaucrat::signForm(AForm &f)
 
 void Bureaucrat::executeForm(const AForm& form) {
     try {
-        form.beExecuted(*this); // must be 'execute', not 'beExecuted'
+        form.beExecuted(*this);
         std::cout << getName() << " executed " << form.getName() << std::endl;
     } catch (std::exception& e) {
         std::cout << getName() << " couldn’t execute " << form.getName()
