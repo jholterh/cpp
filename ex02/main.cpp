@@ -1,16 +1,24 @@
 #include "Bureaucrat.hpp"
 #include "AForm.hpp"
 #include "ShrubberyCreationForm.hpp"
+#include "RobotomyRequestForm.hpp"
+#include <cstdlib>  // std::srand, std::rand
+#include <ctime>    // std::time
 
 int main() {
+    std::srand(std::time(NULL));
     Bureaucrat alice("Alice", 5);
     Bureaucrat bob("Bob", 100);
 
-    ShrubberyCreationForm shrubbyForm1("Isa");
-    ShrubberyCreationForm shrubbyForm2("Milan");
-    alice.signForm(shrubbyForm1);
-    bob.executeForm(shrubbyForm1);
-    alice.signForm(shrubbyForm2);
-    bob.executeForm(shrubbyForm2);
+    ShrubberyCreationForm shrubbyForm("Isa");
+    alice.signForm(shrubbyForm);
+    bob.executeForm(shrubbyForm);
+
+    RobotomyRequestForm robForm("rob");
+    bob.signForm(robForm);
+    alice.signForm(robForm);
+    alice.executeForm(robForm);
+
+
     return 0;
 }
