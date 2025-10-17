@@ -50,7 +50,7 @@ class AForm
         void                checkGrade(const int grade) const;
 
         void                beSigned(const Bureaucrat &b);
-        void                execute(const Bureaucrat &executor) const;
+        void                beExecuted(const Bureaucrat &executor) const;
     
     protected:
         AForm();

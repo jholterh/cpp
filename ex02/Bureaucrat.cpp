@@ -59,12 +59,22 @@ int Bureaucrat::getGrade() const
     return _grade;
 }
 
-void Bureaucrat::signForm(Form &f)
+void Bureaucrat::signForm(AForm &f)
 {
     try {
         f.beSigned(*this);
         std::cout << *this << " signed " << f << std::endl;
     } catch (std::exception &e) {
         std::cout << *this << " couldn't sign " << f << " because " << e.what() << std::endl;
+    }
+}
+
+void Bureaucrat::executeForm(const AForm& form) {
+    try {
+        form.beExecuted(*this); // must be 'execute', not 'beExecuted'
+        std::cout << getName() << " executed " << form.getName() << std::endl;
+    } catch (std::exception& e) {
+        std::cout << getName() << " couldn’t execute " << form.getName()
+                  << " because: " << e.what() << std::endl;
     }
 }
