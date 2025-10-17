@@ -38,7 +38,6 @@ class AForm
                 }
         };
 
-        AForm();
         AForm(const std::string &name, const int signGrade, const int executeGrade);
         AForm(const AForm &copy);
         AForm &operator=(const AForm &other);
@@ -54,6 +53,7 @@ class AForm
         void                execute(const Bureaucrat &executor) const;
     
     protected:
+        AForm();
         virtual void        action() const = 0;
 
     private:
