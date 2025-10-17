@@ -6,6 +6,23 @@ int main()
     std::cout << "\n-----------------------------------------------\n" << std::endl;
     try
     {
+        std::cout << "Test: Constructors" << std::endl;
+        Bureaucrat a("Alice", 100);
+        std::cout << "normal constructor: "<< a << std::endl;
+        std::cout << "First incrementing and then copy constructor" << std::endl;
+        a.incrementGrade();
+        Bureaucrat b(a);
+        std::cout << "printing the copied version: "<< b << std::endl;
+        Bureaucrat c = b;
+        std::cout << "printing the = overload: "<< c << std::endl;
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << "Caught exception: " << e.what() << std::endl;
+    }
+    std::cout << "\n-----------------------------------------------\n" << std::endl;
+    try
+    {
         std::cout << "Test: Bureaucrat grade 1000" << std::endl;
         Bureaucrat a("Alice", 1000);
     }
