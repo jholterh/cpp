@@ -2,6 +2,7 @@
 #include "AForm.hpp"
 #include "ShrubberyCreationForm.hpp"
 #include "RobotomyRequestForm.hpp"
+#include "PresidentialPardonForm.hpp"
 #include <cstdlib>  // std::srand, std::rand
 #include <ctime>    // std::time
 
@@ -14,11 +15,14 @@ int main() {
     alice.signForm(shrubbyForm);
     bob.executeForm(shrubbyForm);
 
-    RobotomyRequestForm robForm("rob");
+    RobotomyRequestForm robForm("Rob");
     bob.signForm(robForm);
     alice.signForm(robForm);
     alice.executeForm(robForm);
 
+    PresidentialPardonForm presForm("Milan");
+    alice.signForm(presForm);
+    alice.executeForm(presForm);
 
     return 0;
 }
