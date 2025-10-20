@@ -6,7 +6,7 @@ CXXFLAGS = -std=c++98 -Wall -Wextra -Werror
 OBJDIR = build
 
 # Source and output
-SRC = main.cpp Bureaucrat.cpp AForm.cpp ShrubberyCreationForm.cpp RobotomyRequestForm.cpp PresidentialPardonForm.cpp
+SRC = main.cpp Bureaucrat.cpp AForm.cpp ShrubberyCreationForm.cpp RobotomyRequestForm.cpp PresidentialPardonForm.cpp Intern.cpp
 OBJ = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRC))
 NAME = forms
 
