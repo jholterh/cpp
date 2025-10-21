@@ -6,9 +6,9 @@ CXXFLAGS = -std=c++98 -Wall -Wextra -Werror
 OBJDIR = build
 
 # Source and output
-SRC = main.cpp Bureaucrat.cpp AForm.cpp ShrubberyCreationForm.cpp RobotomyRequestForm.cpp PresidentialPardonForm.cpp Intern.cpp
+SRC = main.cpp ScalarConverter.cpp
 OBJ = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRC))
-NAME = intern
+NAME = scalar
 
 # Default rule
 all: $(NAME)
@@ -29,8 +29,6 @@ clean:
 # Clean objects + binary + shrubbery files
 fclean: clean
 	rm -f $(NAME)
-	# Remove any files ending with _shrubbery in the working directory
-	rm -f *_shrubbery
 
 # Rebuild
 re: fclean all
