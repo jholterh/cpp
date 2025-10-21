@@ -2,9 +2,12 @@
 #include <iostream>
 #include <cstdlib>   // strtol
 #include <cerrno>    // errno, ERANGE
-#include <climits>   // INT_MIN, INT_MAX
+#include <climits> 
+#include <limits>   // INT_MIN, INT_MAX
 #include <cfloat>    // FLT_MAX
-#include <cctype> 
+#include <cctype>
+#include <cmath>
+
 
 ScalarConverter::ScalarConverter() {}
 
@@ -71,41 +74,150 @@ bool isFloat(const std::string &s, float &out)
     return true;
 }
 
-
-void print_int_char(const std::string &s)
+void convert_from_char(char c)
 {
-    int impos = 0;
-    errno = 0;
-    char *endptr = 0;
-    const char *begin = s.c_str();
-    long value = std::strtol(begin, &endptr, 10);
-    if (errno == ERANGE) impos = 1;
-    if (endptr != begin + s.size()) impos = 1;
-    if (value < INT_MIN || value > INT_MAX) impos = 1;
-    if (impos)
-    {
-        std::cout << "char: impossible" << std::endl;
-        std::cout << "int: impossible" << std::endl;
-    }
+    int i = static_cast<int>(c);
+    float f = static_cast<float>(c);
+    double d = static_cast<double>(c);
+
+    std::cout << "char: ";
+    if (!std::isprint(static_cast<unsigned char>(c)))
+        std::cout << "Non displayable" << std::endl;
     else
-    {
-        int value = static_cast<int>(value);
-        if (std::isprint(value))
-            std::cout << "char: " << static_cast<char>(value) << std::endl;
-        else
-            std::cout << "char: Non displayable" << std::endl;
-        std::cout << "int: " << value << std::endl;
+        std::cout << "'" << c << "'" << std::endl;
+
+    std::cout << "int: " << i << std::endl;
+
+    std::cout << "float: " << f;
+    if (f - static_cast<int>(f) == 0)
+        std::cout << ".0";
+    std::cout << "f" << std::endl;
+
+    std::cout << "double: " << d;
+    if (d - static_cast<int>(d) == 0)
+        std::cout << ".0";
+    std::cout << std::endl;
+}
+
+void convert_from_int(int i)
+{
+    std::cout << "char: ";
+    if (i < 0 || i > 127)
+        std::cout << "impossible" << std::endl;
+    else if (!std::isprint(static_cast<unsigned char>(i)))
+        std::cout << "Non displayable" << std::endl;
+    else
+        std::cout << "'" << static_cast<char>(i) << "'" << std::endl;
+
+    std::cout << "int: " << i << std::endl;
+
+    float f = static_cast<float>(i);
+    std::cout << "float: " << f;
+    if (f - static_cast<int>(f) == 0)
+        std::cout << ".0";
+    std::cout << "f" << std::endl;
+
+    double d = static_cast<double>(i);
+    std::cout << "double: " << d;
+    if (d - static_cast<int>(d) == 0)
+        std::cout << ".0";
+    std::cout << std::endl;
+}
+
+void convert_from_float(float f)
+{
+    // CHAR
+    std::cout << "char: ";
+    if (std::isnan(f) || std::isinf(f) || f < 0 || f > 127)
+        std::cout << "impossible" << std::endl;
+    else if (!std::isprint(static_cast<unsigned char>(f)))
+        std::cout << "Non displayable" << std::endl;
+    else
+        std::cout << "'" << static_cast<char>(f) << "'" << std::endl;
+
+    // INT
+    std::cout << "int: ";
+    if (std::isnan(f) || std::isinf(f) || f < static_cast<float>(std::numeric_limits<int>::min()) || f > static_cast<float>(std::numeric_limits<int>::max()))
+        std::cout << "impossible" << std::endl;
+    else
+        std::cout << static_cast<int>(f) << std::endl;
+
+    // FLOAT
+    std::cout << "float: ";
+    if (std::isnan(f))
+        std::cout << "nanf" << std::endl;
+    else if (std::isinf(f))
+        std::cout << (f < 0 ? "-inff" : "+inff") << std::endl;
+    else {
+        std::cout << f;
+        if (f - static_cast<int>(f) == 0)
+            std::cout << ".0";
+        std::cout << "f" << std::endl;
+    }
+
+    // DOUBLE
+    double d = static_cast<double>(f);
+    std::cout << "double: ";
+    if (std::isnan(f))
+        std::cout << "nan" << std::endl;
+    else if (std::isinf(f))
+        std::cout << (f < 0 ? "-inf" : "+inf") << std::endl;
+    else {
+        std::cout << d;
+        if (d - static_cast<int>(d) == 0)
+            std::cout << ".0";
+        std::cout << std::endl;
     }
 }
 
-void float_to_all(const std::string &s, float &out)
+void convert_from_double(double d)
 {
-    print_int_char(s);
-    std::cout << "float: " << out << std::endl;
-    
+    // CHAR
+    std::cout << "char: ";
+    if (std::isnan(d) || std::isinf(d) || d < 0 || d > 127)
+        std::cout << "impossible" << std::endl;
+    else if (!std::isprint(static_cast<unsigned char>(d)))
+        std::cout << "Non displayable" << std::endl;
+    else
+        std::cout << "'" << static_cast<char>(d) << "'" << std::endl;
+
+    // INT
+    std::cout << "int: ";
+    if (std::isnan(d) || std::isinf(d) || d < static_cast<double>(std::numeric_limits<int>::min()) || d > static_cast<double>(std::numeric_limits<int>::max()))
+        std::cout << "impossible" << std::endl;
+    else
+        std::cout << static_cast<int>(d) << std::endl;
+
+    // FLOAT
+    std::cout << "float: ";
+    float f = static_cast<float>(d);
+    if (std::isnan(d))
+        std::cout << "nanf" << std::endl;
+    else if (std::isinf(d))
+        std::cout << (d < 0 ? "-inff" : "+inff") << std::endl;
+    else {
+        std::cout << f;
+        if (f - static_cast<int>(f) == 0)
+            std::cout << ".0";
+        std::cout << "f" << std::endl;
+    }
+
+    // DOUBLE
+    std::cout << "double: ";
+    if (std::isnan(d))
+        std::cout << "nan" << std::endl;
+    else if (std::isinf(d))
+        std::cout << (d < 0 ? "-inf" : "+inf") << std::endl;
+    else {
+        std::cout << d;
+        if (d - static_cast<int>(d) == 0)
+            std::cout << ".0";
+        std::cout << std::endl;
+    }
 }
 
-void ScalarConverter::convert(std::string &input)
+
+void ScalarConverter::convert(const std::string &input)
 {
     char    out1;
     int     out2;
@@ -113,13 +225,26 @@ void ScalarConverter::convert(std::string &input)
     float   out4;
 
     if (isChar(input, out1))
-        std::cout << input << " is this char: " << out1 << std::endl;
+    {
+        convert_from_char(out1);
+    }
+        
     else if (isInt(input, out2))
-        std::cout << input << " is this integer: " << out2 << std::endl;
+    {
+        convert_from_int(out2);
+    }
+        
     else if (isDouble(input, out3))
-        std::cout << input << " is this double: " << out3 << std::endl;
+    {
+        convert_from_double(out3);
+    }
+        
     else if (isFloat(input, out4))
-        std::cout << input << " is this double: " << out4 << std::endl;
+    {
+        convert_from_float(out4);
+    }
+        
     else
         std::cout << input << " is neither a char, an int, a float nor a double" << std::endl;
+    std::cout << "\n" << std::endl;
 }

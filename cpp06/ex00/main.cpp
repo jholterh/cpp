@@ -1,55 +1,60 @@
 #include "ScalarConverter.hpp"
 #include <string>
 
-int main()
-{
-    std::string input = "";
+#include <iostream>
+#include <string>
+#include "ScalarConverter.hpp" // Or your header name
+
+void run_test(const std::string& input) {
+    std::cout << "Test input: " << input << std::endl;
     ScalarConverter::convert(input);
-    input = "b";
-    ScalarConverter::convert(input);
-    input = "'b'";
-    ScalarConverter::convert(input);
-    input = "bs";
-    ScalarConverter::convert(input);
-    input = "1234567";
-    ScalarConverter::convert(input);
-    input = "+1234567";
-    ScalarConverter::convert(input);
-    input = "-1234567";
-    ScalarConverter::convert(input);
-    input = "+";
-    ScalarConverter::convert(input);
-    input = "++";
-    ScalarConverter::convert(input);
-    input = "++1234567";
-    ScalarConverter::convert(input);
-    input = " +1234567";
-    ScalarConverter::convert(input);
-    input = "+1234567 ";
-    ScalarConverter::convert(input);
-    input = "+1234 567";
-    ScalarConverter::convert(input);
-    input = "+1234s567";
-    ScalarConverter::convert(input);
-    input = "-12345678910";
-    ScalarConverter::convert(input);
-    input = "3.14";
-    ScalarConverter::convert(input);
-    input = "-3.14";
-    ScalarConverter::convert(input);
-    input = " 3.14";
-    ScalarConverter::convert(input);
-    input = "3.14 ";
-    ScalarConverter::convert(input);
-    input = "2.7182818284590452353602874713527";
-    ScalarConverter::convert(input);
-    input = "2.718f";
-    ScalarConverter::convert(input);
-    input = "2.718fs";
-    ScalarConverter::convert(input);
-    input = " 2.718f";
-    ScalarConverter::convert(input);
-    input = "2718f";
-    ScalarConverter::convert(input);
+    std::cout << "-----------------------------" << std::endl;
+}
+
+int main() {
+    // Char literals (printable)
+    run_test("'a'");
+    run_test("'Z'");
+    run_test("'0'");
+
+    // Int literals
+    run_test("0");
+    run_test("-42");
+    run_test("42");
+    run_test("127");
+    run_test("128");
+    run_test("-128");
+    run_test("2147483647"); // INT_MAX
+    run_test("-2147483648"); // INT_MIN
+    run_test("2147483648"); // Overflow
+
+    // Float literals
+    run_test("0.0f");
+    run_test("-4.2f");
+    run_test("4.2f");
+    run_test("42.0f");
+    run_test("nanf");
+    run_test("+inff");
+    run_test("-inff");
+    run_test("340282346638528859811704183484516925440.0f"); // FLT_MAX
+    run_test("3402823466385288598117041834845169254400.0f"); // Overflow
+
+    // Double literals
+    run_test("0.0");
+    run_test("-4.2");
+    run_test("4.2");
+    run_test("42.0");
+    run_test("nan");
+    run_test("+inf");
+    run_test("-inf");
+    run_test("1.7976931348623157e+308"); // DBL_MAX
+    run_test("1.7976931348623157e+309"); // Overflow
+
+    // Edge cases
+    run_test("not_a_number");
+    run_test("");
+    run_test("'ab'"); // Invalid char literal
+    run_test("' '"); // Space character
+
     return 0;
 }
