@@ -24,6 +24,22 @@ ScalarConverter &ScalarConverter::operator=(const ScalarConverter &other)
 
 ScalarConverter::~ScalarConverter() {}
 
+// --- Helper functions ---
+
+bool isPseudoFloat(const std::string &s, float &out) {
+    if (s == "nanf") { out = std::numeric_limits<float>::quiet_NaN(); return true; }
+    if (s == "+inff" || s == "inff") { out = std::numeric_limits<float>::infinity(); return true; }
+    if (s == "-inff") { out = -std::numeric_limits<float>::infinity(); return true; }
+    return false;
+}
+
+bool isPseudoDouble(const std::string &s, double &out) {
+    if (s == "nan") { out = std::numeric_limits<double>::quiet_NaN(); return true; }
+    if (s == "+inf" || s == "inf") { out = std::numeric_limits<double>::infinity(); return true; }
+    if (s == "-inf") { out = -std::numeric_limits<double>::infinity(); return true; }
+    return false;
+}
+
 bool isChar(const std::string &s, char &out)
 {
     if (s.size() != 3 || s[0] != '\'' || s[2] != '\'' || !std::isprint(s[1])) return false;
@@ -46,9 +62,29 @@ bool isInt(const std::string &s, int &out)
     return true;
 }
 
+// Float: must end with 'f', and not be a pseudo-literal
+bool isFloat(const std::string &s, float &out)
+{
+    if (isPseudoFloat(s, out)) return true;
+    if (s.empty() || s[s.size()-1] != 'f') return false;
+    if (std::isspace((unsigned char)s[0])) return false;
+    errno = 0;
+    char *endptr = 0;
+    const char *begin = s.c_str();
+    float value = std::strtof(begin, &endptr);
+    if (errno == ERANGE) return false;
+    if (endptr != begin + s.size() - 1) return false;
+    if (*endptr != 'f' || *(endptr + 1) != '\0') return false;
+    out = value;
+    return true;
+}
+
+// Double: must have '.' or pseudo-literal, and not end with 'f'
 bool isDouble(const std::string &s, double &out)
 {
+    if (isPseudoDouble(s, out)) return true;
     if (s.find('.') == std::string::npos) return false;
+    if (!s.empty() && s[s.size()-1] == 'f') return false; // Don't accept float literals
     if (std::isspace((unsigned char)s[0])) return false;
     errno = 0;
     char *endptr = 0;
@@ -60,19 +96,7 @@ bool isDouble(const std::string &s, double &out)
     return true;
 }
 
-bool isFloat(const std::string &s, float &out)
-{
-    if (s.find('f') == std::string::npos) return false;
-    if (std::isspace((unsigned char)s[0])) return false;
-    errno = 0;
-    char *endptr = 0;
-    const char *begin = s.c_str();
-    float value = std::strtof(begin, &endptr);
-    if (errno == ERANGE) return false;
-    if (*endptr != 'f' || *(endptr + 1) != '\0') return false;
-    out = value;
-    return true;
-}
+// --- Conversion and Output functions ---
 
 void convert_from_char(char c)
 {
@@ -216,35 +240,24 @@ void convert_from_double(double d)
     }
 }
 
+// --- Main conversion dispatcher ---
 
 void ScalarConverter::convert(const std::string &input)
 {
     char    out1;
     int     out2;
-    double  out3;
     float   out4;
+    double  out3;
 
     if (isChar(input, out1))
-    {
         convert_from_char(out1);
-    }
-        
     else if (isInt(input, out2))
-    {
         convert_from_int(out2);
-    }
-        
-    else if (isDouble(input, out3))
-    {
-        convert_from_double(out3);
-    }
-        
     else if (isFloat(input, out4))
-    {
         convert_from_float(out4);
-    }
-        
+    else if (isDouble(input, out3))
+        convert_from_double(out3);
     else
         std::cout << input << " is neither a char, an int, a float nor a double" << std::endl;
-    std::cout << "\n" << std::endl;
+    std::cout << std::endl;
 }
