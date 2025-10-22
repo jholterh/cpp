@@ -112,19 +112,17 @@ void convert_from_char(char c)
 
     std::cout << "int: " << i << std::endl;
 
-    std::cout << "float: " << f;
-    if (f - static_cast<int>(f) == 0)
-        std::cout << ".0";
-    std::cout << "f" << std::endl;
+    std::cout << "float: " << f << ".0f" << std::endl;
+    
+    std::cout << "double: " << d << ".0" << std::endl;
 
-    std::cout << "double: " << d;
-    if (d - static_cast<int>(d) == 0)
-        std::cout << ".0";
-    std::cout << std::endl;
 }
 
 void convert_from_int(int i)
 {
+    float f = static_cast<float>(i);
+    double d = static_cast<double>(i);
+
     std::cout << "char: ";
     if (i < 0 || i > 127)
         std::cout << "impossible" << std::endl;
@@ -135,17 +133,9 @@ void convert_from_int(int i)
 
     std::cout << "int: " << i << std::endl;
 
-    float f = static_cast<float>(i);
-    std::cout << "float: " << f;
-    if (f - static_cast<int>(f) == 0)
-        std::cout << ".0";
-    std::cout << "f" << std::endl;
-
-    double d = static_cast<double>(i);
-    std::cout << "double: " << d;
-    if (d - static_cast<int>(d) == 0)
-        std::cout << ".0";
-    std::cout << std::endl;
+    std::cout << "float: " << f << ".0f" << std::endl;
+    
+    std::cout << "double: " << d << ".0" << std::endl;
 }
 
 void convert_from_float(float f)
