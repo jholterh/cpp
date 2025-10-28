@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <stdexcept>
 
-Span::Span() : _max(0), _array(0), _currentSize(0) {}
+Span::Span() : _array(0), _max(0), _currentSize(0) {}
 
 Span::Span(unsigned int n) : _max(n), _currentSize(0)
 {
@@ -76,4 +76,21 @@ int Span::shortestSpan() const
     }
     delete[] tmp;
     return shortest;
+}
+
+int Span::longestSpan() const
+{
+    if (_currentSize < 2)
+        throw std::logic_error("Not enough values to find the longest span");
+    int min = *std::min_element(begin(), end());
+    int max = *std::max_element(begin(), end());
+    return max - min;
+}
+
+void Span::printSpan() const
+{
+    std::cout << "Span[size=" << _currentSize << "]" << std::endl;
+    for (int i = 0; i < _currentSize; i++)
+        std::cout << _array[i] << " ";
+    std::cout << std::endl;
 }

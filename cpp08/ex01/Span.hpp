@@ -3,8 +3,8 @@
 #ifndef SPAN_HPP
 #define SPAN_HPP
 
-#include <cstddef> 
-
+#include <cstddef>
+#include <iostream>
 class Span
 {
     public:
@@ -21,6 +21,10 @@ class Span
         int *end();
         int shortestSpan() const;
         int longestSpan() const;
+        void printSpan() const;
+
+        template <typename Iterator>
+        void addNumbers(Iterator begin, Iterator end);
         
     private:
         int *_array;
@@ -28,5 +32,8 @@ class Span
         int _currentSize;
 
 };
+
+#include "Span.tpp"
+
 
 #endif
