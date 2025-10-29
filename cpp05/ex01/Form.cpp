@@ -44,7 +44,7 @@ std::ostream& operator<<(std::ostream& os, const Form& f)
 }
 
 
-const std::string Form::getName() const
+const std::string &Form::getName() const
 {
     return _name;
 }
