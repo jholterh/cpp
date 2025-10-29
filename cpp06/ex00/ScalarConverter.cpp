@@ -133,10 +133,20 @@ void convert_from_int(int i)
 
     std::cout << "int: " << i << std::endl;
 
-    std::cout << "float: " << f << ".0f" << std::endl;
-    
-    std::cout << "double: " << d << ".0" << std::endl;
+    std::cout << "float: ";
+    if (f == static_cast<int>(f))
+        std::cout << static_cast<int>(f) << ".0f" << std::endl;
+    else
+        std::cout << f << "f" << std::endl;
+
+    std::cout << "double: ";
+    if (d == static_cast<int>(d))
+        std::cout << static_cast<int>(d) << ".0" << std::endl;
+    else
+        std::cout << d << std::endl;
 }
+
+
 
 void convert_from_float(float f)
 {
