@@ -6,7 +6,7 @@ CXXFLAGS = -std=c++98 -Wall -Wextra -Werror
 OBJDIR = build
 
 # Source and output
-SRC = main.cpp BitcoinExchange.cppto
+SRC = main.cpp BitcoinExchange.cpp
 OBJ = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRC))
 NAME = main
 
