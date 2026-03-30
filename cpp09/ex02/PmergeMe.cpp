@@ -1,5 +1,7 @@
 #include "PmergeMe.hpp"
 
+// === Canonical form ===
+
 PmergeMe::PmergeMe() : _straggler(0), _has_straggler(false), _vec_comp_count(0), _vec_time(0), _deq_comp_count(0), _deq_time(0) {}
 
 PmergeMe::PmergeMe(std::vector<int> &input) : _unsorted(input), _straggler(0), _has_straggler(input.size() % 2 != 0), _vec_comp_count(0), _vec_time(0), _deq_comp_count(0), _deq_time(0)
@@ -7,6 +9,27 @@ PmergeMe::PmergeMe(std::vector<int> &input) : _unsorted(input), _straggler(0), _
     if (_has_straggler)
         _straggler = _unsorted.back();
 }
+
+PmergeMe::PmergeMe(const PmergeMe &copy) : _unsorted(copy._unsorted), _straggler(copy._straggler), _has_straggler(copy._has_straggler), _vec_comp_count(copy._vec_comp_count), _vec_time(copy._vec_time), _deq_comp_count(copy._deq_comp_count), _deq_time(copy._deq_time) {}
+
+PmergeMe &PmergeMe::operator=(const PmergeMe &other)
+{
+    if (this != &other)
+    {
+        _unsorted = other._unsorted;
+        _vec_comp_count = other._vec_comp_count;
+        _vec_time = other._vec_time;
+        _deq_comp_count = other._deq_comp_count;
+        _deq_time = other._deq_time;
+        _has_straggler = other._has_straggler;
+        _straggler = other._straggler;
+    }
+    return *this;
+}
+
+PmergeMe::~PmergeMe() {}
+
+// === Shared helper ===
 
 std::vector<int> PmergeMe::buildInsertionOrder(int totalPending)
 {
@@ -37,35 +60,12 @@ std::vector<int> PmergeMe::buildInsertionOrder(int totalPending)
     return order;
 }
 
-PmergeMe::PmergeMe(const PmergeMe &copy) : _unsorted(copy._unsorted), _straggler(copy._straggler), _has_straggler(copy._has_straggler), _vec_comp_count(copy._vec_comp_count), _vec_time(copy._vec_time), _deq_comp_count(copy._deq_comp_count), _deq_time(copy._deq_time) {}
-
-PmergeMe &PmergeMe::operator=(const PmergeMe &other)
-{
-    if (this != &other)
-    {
-        _unsorted = other._unsorted;
-        _vec_comp_count = other._vec_comp_count;
-        _vec_time = other._vec_time;
-        _deq_comp_count = other._deq_comp_count;
-        _deq_time = other._deq_time;
-        _has_straggler = other._has_straggler;
-        _straggler = other._straggler;
-    }
-    return *this;
-}
-
-PmergeMe::~PmergeMe() {}
+// === Vector pipeline ===
 
 // wrapper function to count the comparisons
 bool                    PmergeMe::compareVec(int a, int b)
 {
     _vec_comp_count++;
-    return (a > b);
-}
-
-bool                    PmergeMe::compareDeq(int a, int b)
-{
-    _deq_comp_count++;
     return (a > b);
 }
 
@@ -77,27 +77,6 @@ std::vector<Pair>       PmergeMe::pairVec()
     {
         Pair p;
         if (compareVec(_unsorted[i * 2], _unsorted[i * 2 + 1]))
-        {
-            p.larger = _unsorted[i * 2];
-            p.smaller = _unsorted[i * 2 + 1];
-        }
-        else
-        {
-            p.smaller = _unsorted[i * 2];
-            p.larger = _unsorted[i * 2 + 1];
-        }
-        pairs.push_back(p);
-    }
-    return pairs;
-}
-
-std::deque<Pair>        PmergeMe::pairDeq()
-{
-    std::deque<Pair> pairs;
-    for (int i = 0; (int)_unsorted.size() / 2 > i; i++)
-    {
-        Pair p;
-        if (compareDeq(_unsorted[i * 2], _unsorted[i * 2 + 1]))
         {
             p.larger = _unsorted[i * 2];
             p.smaller = _unsorted[i * 2 + 1];
@@ -213,6 +192,103 @@ void                    PmergeMe::sortLargerVec(std::vector<Pair>& pairs)
     pairs = chain;
 }
 
+// ties it all together
+void PmergeMe::buildMainChainVec()
+{
+    _vec.push_back(_vecPairs[0].smaller);
+    for (int i = 0; i < (int)_vecPairs.size(); i++)
+        _vec.push_back(_vecPairs[i].larger);
+
+    int numLosers = (int)_vecPairs.size();
+    int totalPending = (numLosers - 1) + (_has_straggler ? 1 : 0);
+
+    if (totalPending > 0)
+    {
+        std::vector<int> insertOrder = buildInsertionOrder(totalPending);
+
+        std::vector<int> offsets(_vecPairs.size(), 0);
+        for (int k = 0; k < (int)insertOrder.size(); k++)
+        {
+            int idx = insertOrder[k]; // 1-based pending index
+            int value;
+            int hi;
+
+            if (idx <= numLosers - 1)
+            {
+                value = _vecPairs[idx].smaller;
+                hi = idx + offsets[idx];
+            }
+            else
+            {
+                value = _straggler;
+                hi = (int)_vec.size() - 1;
+            }
+
+            int lo = 0;
+            while (hi >= lo)
+            {
+                int mid = (lo + hi) / 2;
+                if (compareVec(_vec[mid], value))
+                    hi = mid - 1;
+                else
+                    lo = mid + 1;
+            }
+            _vec.insert(_vec.begin() + lo, value);
+            for (int i = 0; i < (int)_vecPairs.size(); i++)
+            {
+                if (i + 1 + offsets[i] >= lo)
+                    offsets[i]++;
+            }
+        }
+    }
+}
+
+void PmergeMe::sortVec()
+{
+    clock_t start = clock();
+    if (_unsorted.size() <= 1)
+    {
+        _vec = _unsorted;
+    }
+    else
+    {
+        _vecPairs = pairVec();
+        sortLargerVec(_vecPairs);
+        buildMainChainVec();
+    }
+    clock_t end = clock();
+    _vec_time = static_cast<double>(end - start) / CLOCKS_PER_SEC * 1000000;
+}
+
+// === Deque pipeline ===
+
+bool                    PmergeMe::compareDeq(int a, int b)
+{
+    _deq_comp_count++;
+    return (a > b);
+}
+
+std::deque<Pair>        PmergeMe::pairDeq()
+{
+    std::deque<Pair> pairs;
+    for (int i = 0; (int)_unsorted.size() / 2 > i; i++)
+    {
+        Pair p;
+        if (compareDeq(_unsorted[i * 2], _unsorted[i * 2 + 1]))
+        {
+            p.larger = _unsorted[i * 2];
+            p.smaller = _unsorted[i * 2 + 1];
+        }
+        else
+        {
+            p.smaller = _unsorted[i * 2];
+            p.larger = _unsorted[i * 2 + 1];
+        }
+        pairs.push_back(p);
+    }
+    return pairs;
+}
+
 void                    PmergeMe::sortLargerDeq(std::deque<Pair>& pairs)
 {
     if (pairs.size() <= 1)
@@ -306,57 +382,6 @@ void                    PmergeMe::sortLargerDeq(std::deque<Pair>& pairs)
     pairs = chain;
 }
 
-// ties it all together
-void PmergeMe::buildMainChainVec()
-{
-    _vec.push_back(_vecPairs[0].smaller);
-    for (int i = 0; i < (int)_vecPairs.size(); i++)
-        _vec.push_back(_vecPairs[i].larger);
-
-    int numLosers = (int)_vecPairs.size();
-    int totalPending = (numLosers - 1) + (_has_straggler ? 1 : 0);
-
-    if (totalPending > 0)
-    {
-        std::vector<int> insertOrder = buildInsertionOrder(totalPending);
-
-        std::vector<int> offsets(_vecPairs.size(), 0);
-        for (int k = 0; k < (int)insertOrder.size(); k++)
-        {
-            int idx = insertOrder[k]; // 1-based pending index
-            int value;
-            int hi;
-
-            if (idx <= numLosers - 1)
-            {
-                value = _vecPairs[idx].smaller;
-                hi = idx + offsets[idx];
-            }
-            else
-            {
-                value = _straggler;
-                hi = (int)_vec.size() - 1;
-            }
-
-            int lo = 0;
-            while (hi >= lo)
-            {
-                int mid = (lo + hi) / 2;
-                if (compareVec(_vec[mid], value))
-                    hi = mid - 1;
-                else
-                    lo = mid + 1;
-            }
-            _vec.insert(_vec.begin() + lo, value);
-            for (int i = 0; i < (int)_vecPairs.size(); i++)
-            {
-                if (i + 1 + offsets[i] >= lo)
-                    offsets[i]++;
-            }
-        }
-    }
-}
-
 void PmergeMe::buildMainChainDeq()
 {
     _deq.push_back(_deqPairs[0].smaller);
@@ -407,23 +432,6 @@ void PmergeMe::buildMainChainDeq()
     }
 }
 
-void PmergeMe::sortVec()
-{
-    clock_t start = clock();
-    if (_unsorted.size() <= 1)
-    {
-        _vec = _unsorted;
-    }
-    else
-    {
-        _vecPairs = pairVec();
-        sortLargerVec(_vecPairs);
-        buildMainChainVec();
-    }
-    clock_t end = clock();
-    _vec_time = static_cast<double>(end - start) / CLOCKS_PER_SEC * 1000000;
-}
-
 void PmergeMe::sortDeq()
 {
     clock_t start = clock();
@@ -442,11 +450,15 @@ void PmergeMe::sortDeq()
     _deq_time = static_cast<double>(end - start) / CLOCKS_PER_SEC * 1000000;
 }
 
+// === Entry point ===
+
 void PmergeMe::sort()
 {
     sortVec();
     sortDeq();
 }
+
+// === Display ===
 
 void PmergeMe::displayBefore()
 {
@@ -484,7 +496,3 @@ void PmergeMe::displayResults()
     displayAfter();
     displayTiming();
 }
-
-
-
-
