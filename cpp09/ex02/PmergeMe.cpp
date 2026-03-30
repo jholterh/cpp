@@ -1,7 +1,5 @@
 #include "PmergeMe.hpp"
 
-// === Canonical form ===
-
 PmergeMe::PmergeMe() : _straggler(0), _has_straggler(false), _vec_comp_count(0), _vec_time(0), _deq_comp_count(0), _deq_time(0) {}
 
 PmergeMe::PmergeMe(std::vector<int> &input) : _unsorted(input), _straggler(0), _has_straggler(input.size() % 2 != 0), _vec_comp_count(0), _vec_time(0), _deq_comp_count(0), _deq_time(0)
@@ -29,7 +27,9 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &other)
 
 PmergeMe::~PmergeMe() {}
 
-// === Shared helper ===
+// Shared helper
+// jacobsthal recurrence: t(k) = t(k-1) + 2 * t(k-2)
+// k is index, t(k) means jacobstal of index k
 
 std::vector<int> PmergeMe::buildInsertionOrder(int totalPending)
 {
@@ -60,7 +60,7 @@ std::vector<int> PmergeMe::buildInsertionOrder(int totalPending)
     return order;
 }
 
-// === Vector pipeline ===
+// Vector pipeline
 
 // wrapper function to count the comparisons
 bool                    PmergeMe::compareVec(int a, int b)
@@ -97,7 +97,7 @@ void                    PmergeMe::sortLargerVec(std::vector<Pair>& pairs)
     if (pairs.size() <= 1)
         return;
 
-    // step i: pairwise comparisons, track winner-loser pairings
+    // pairwise comparisons, track winner-loser pairings
     bool hasOdd = pairs.size() % 2 != 0;
     Pair oddPair;
     if (hasOdd)
@@ -121,7 +121,7 @@ void                    PmergeMe::sortLargerVec(std::vector<Pair>& pairs)
     // save pairings before recursive sort reorders winners
     std::vector<Pair> origWinners(winners);
 
-    // step ii: recursively sort winners
+    // recursively sort winners
     sortLargerVec(winners);
 
     // reorder losers to match sorted winners
@@ -139,7 +139,7 @@ void                    PmergeMe::sortLargerVec(std::vector<Pair>& pairs)
         }
     }
 
-    // step iii: build main chain with Jacobsthal insertion order
+    // build main chain with Jacobsthal insertion order
     std::vector<Pair> chain;
     chain.push_back(sortedLosers[0]);
     for (int i = 0; i < (int)winners.size(); i++)
