@@ -37,18 +37,18 @@ std::vector<int> PmergeMe::buildInsertionOrder(int totalPending)
     if (totalPending <= 0)
         return order;
     std::vector<int> jacob;
-    int tk2 = 1, tk1 = 1;
+    int prev2 = 1, prev1 = 1;
     while (true)
     {
-        int tk = tk1 + 2 * tk2;
-        int bound = tk - 1;
-        if (bound > totalPending)
-            bound = totalPending;
-        jacob.push_back(bound);
-        if (bound >= totalPending)
+        int current = prev1 + 2 * prev2;
+        int groupEnd = current - 1;
+        if (groupEnd > totalPending)
+            groupEnd = totalPending;
+        jacob.push_back(groupEnd);
+        if (groupEnd >= totalPending)
             break;
-        tk2 = tk1;
-        tk1 = tk;
+        prev2 = prev1;
+        prev1 = current;
     }
     int prev = 0;
     for (int i = 0; i < (int)jacob.size(); i++)
@@ -154,38 +154,38 @@ void                    PmergeMe::sortLargerVec(std::vector<Pair>& pairs)
         std::vector<int> insertOrder = buildInsertionOrder(totalPending);
 
         // insert in Jacobsthal order
-        std::vector<int> offsets(winners.size(), 0);
+        std::vector<int> insertionShifts(winners.size(), 0);
         for (int k = 0; k < (int)insertOrder.size(); k++)
         {
-            int idx = insertOrder[k]; // 1-based pending index
+            int pendingIdx = insertOrder[k]; // 1-based pending index
             Pair toInsert;
-            int hi;
+            int searchHi;
 
-            if (idx <= numLosers - 1)
+            if (pendingIdx <= numLosers - 1)
             {
-                toInsert = sortedLosers[idx];
-                hi = idx + offsets[idx];
+                toInsert = sortedLosers[pendingIdx];
+                searchHi = pendingIdx + insertionShifts[pendingIdx];
             }
             else
             {
                 toInsert = oddPair;
-                hi = (int)chain.size() - 1;
+                searchHi = (int)chain.size() - 1;
             }
 
-            int lo = 0;
-            while (hi >= lo)
+            int searchLo = 0;
+            while (searchHi >= searchLo)
             {
-                int mid = (lo + hi) / 2;
+                int mid = (searchLo + searchHi) / 2;
                 if (compareVec(chain[mid].larger, toInsert.larger))
-                    hi = mid - 1;
+                    searchHi = mid - 1;
                 else
-                    lo = mid + 1;
+                    searchLo = mid + 1;
             }
-            chain.insert(chain.begin() + lo, toInsert);
+            chain.insert(chain.begin() + searchLo, toInsert);
             for (int i = 0; i < (int)winners.size(); i++)
             {
-                if (i + 1 + offsets[i] >= lo)
-                    offsets[i]++;
+                if (i + 1 + insertionShifts[i] >= searchLo)
+                    insertionShifts[i]++;
             }
         }
     }
@@ -206,38 +206,38 @@ void PmergeMe::buildMainChainVec()
     {
         std::vector<int> insertOrder = buildInsertionOrder(totalPending);
 
-        std::vector<int> offsets(_vecPairs.size(), 0);
+        std::vector<int> insertionShifts(_vecPairs.size(), 0);
         for (int k = 0; k < (int)insertOrder.size(); k++)
         {
-            int idx = insertOrder[k]; // 1-based pending index
+            int pendingIdx = insertOrder[k]; // 1-based pending index
             int value;
-            int hi;
+            int searchHi;
 
-            if (idx <= numLosers - 1)
+            if (pendingIdx <= numLosers - 1)
             {
-                value = _vecPairs[idx].smaller;
-                hi = idx + offsets[idx];
+                value = _vecPairs[pendingIdx].smaller;
+                searchHi = pendingIdx + insertionShifts[pendingIdx];
             }
             else
             {
                 value = _straggler;
-                hi = (int)_vec.size() - 1;
+                searchHi = (int)_vec.size() - 1;
             }
 
-            int lo = 0;
-            while (hi >= lo)
+            int searchLo = 0;
+            while (searchHi >= searchLo)
             {
-                int mid = (lo + hi) / 2;
+                int mid = (searchLo + searchHi) / 2;
                 if (compareVec(_vec[mid], value))
-                    hi = mid - 1;
+                    searchHi = mid - 1;
                 else
-                    lo = mid + 1;
+                    searchLo = mid + 1;
             }
-            _vec.insert(_vec.begin() + lo, value);
+            _vec.insert(_vec.begin() + searchLo, value);
             for (int i = 0; i < (int)_vecPairs.size(); i++)
             {
-                if (i + 1 + offsets[i] >= lo)
-                    offsets[i]++;
+                if (i + 1 + insertionShifts[i] >= searchLo)
+                    insertionShifts[i]++;
             }
         }
     }
@@ -344,38 +344,38 @@ void                    PmergeMe::sortLargerDeq(std::deque<Pair>& pairs)
     {
         std::vector<int> insertOrder = buildInsertionOrder(totalPending);
 
-        std::vector<int> offsets(winners.size(), 0);
+        std::vector<int> insertionShifts(winners.size(), 0);
         for (int k = 0; k < (int)insertOrder.size(); k++)
         {
-            int idx = insertOrder[k];
+            int pendingIdx = insertOrder[k];
             Pair toInsert;
-            int hi;
+            int searchHi;
 
-            if (idx <= numLosers - 1)
+            if (pendingIdx <= numLosers - 1)
             {
-                toInsert = sortedLosers[idx];
-                hi = idx + offsets[idx];
+                toInsert = sortedLosers[pendingIdx];
+                searchHi = pendingIdx + insertionShifts[pendingIdx];
             }
             else
             {
                 toInsert = oddPair;
-                hi = (int)chain.size() - 1;
+                searchHi = (int)chain.size() - 1;
             }
 
-            int lo = 0;
-            while (hi >= lo)
+            int searchLo = 0;
+            while (searchHi >= searchLo)
             {
-                int mid = (lo + hi) / 2;
+                int mid = (searchLo + searchHi) / 2;
                 if (compareDeq(chain[mid].larger, toInsert.larger))
-                    hi = mid - 1;
+                    searchHi = mid - 1;
                 else
-                    lo = mid + 1;
+                    searchLo = mid + 1;
             }
-            chain.insert(chain.begin() + lo, toInsert);
+            chain.insert(chain.begin() + searchLo, toInsert);
             for (int i = 0; i < (int)winners.size(); i++)
             {
-                if (i + 1 + offsets[i] >= lo)
-                    offsets[i]++;
+                if (i + 1 + insertionShifts[i] >= searchLo)
+                    insertionShifts[i]++;
             }
         }
     }
@@ -395,38 +395,38 @@ void PmergeMe::buildMainChainDeq()
     {
         std::vector<int> insertOrder = buildInsertionOrder(totalPending);
 
-        std::vector<int> offsets(_deqPairs.size(), 0);
+        std::vector<int> insertionShifts(_deqPairs.size(), 0);
         for (int k = 0; k < (int)insertOrder.size(); k++)
         {
-            int idx = insertOrder[k];
+            int pendingIdx = insertOrder[k];
             int value;
-            int hi;
+            int searchHi;
 
-            if (idx <= numLosers - 1)
+            if (pendingIdx <= numLosers - 1)
             {
-                value = _deqPairs[idx].smaller;
-                hi = idx + offsets[idx];
+                value = _deqPairs[pendingIdx].smaller;
+                searchHi = pendingIdx + insertionShifts[pendingIdx];
             }
             else
             {
                 value = _straggler;
-                hi = (int)_deq.size() - 1;
+                searchHi = (int)_deq.size() - 1;
             }
 
-            int lo = 0;
-            while (hi >= lo)
+            int searchLo = 0;
+            while (searchHi >= searchLo)
             {
-                int mid = (lo + hi) / 2;
+                int mid = (searchLo + searchHi) / 2;
                 if (compareDeq(_deq[mid], value))
-                    hi = mid - 1;
+                    searchHi = mid - 1;
                 else
-                    lo = mid + 1;
+                    searchLo = mid + 1;
             }
-            _deq.insert(_deq.begin() + lo, value);
+            _deq.insert(_deq.begin() + searchLo, value);
             for (int i = 0; i < (int)_deqPairs.size(); i++)
             {
-                if (i + 1 + offsets[i] >= lo)
-                    offsets[i]++;
+                if (i + 1 + insertionShifts[i] >= searchLo)
+                    insertionShifts[i]++;
             }
         }
     }
