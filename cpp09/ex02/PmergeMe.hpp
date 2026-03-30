@@ -2,6 +2,9 @@
 
 #include <vector>
 #include <deque>
+#include <ctime>
+#include <cmath>
+#include <iostream>
 
 struct Pair {
     int     smaller;
@@ -11,7 +14,8 @@ struct Pair {
 class PmergeMe
 {
     public:
-        PmergeMe(std::vector<int> input);
+        PmergeMe();
+        PmergeMe(std::vector<int> &input);
         PmergeMe(const PmergeMe &copy);
         PmergeMe &operator=(const PmergeMe &other);
         ~PmergeMe();
@@ -23,8 +27,6 @@ class PmergeMe
         std::vector<int>    _unsorted;
         int                 _straggler;
         bool                _has_straggler;
-        std::vector<int>    _jakobsthal_number;
-
         // vec
         std::vector<int>    _vec;
         std::vector<Pair>   _vecPairs;
@@ -34,8 +36,6 @@ class PmergeMe
         bool                compareVec(int a, int b);
         std::vector<Pair>   pairVec();
         void                sortLargerVec(std::vector<Pair>& pairs);
-        int                 binarySearchVec(int value, int start, int end);
-        void                binaryInsertVec(int value, int maxSearchIndex);
         void                buildMainChainVec();
 
         // deque
@@ -47,13 +47,10 @@ class PmergeMe
         bool                compareDeq(int a, int b);
         std::deque<Pair>    pairDeq();
         void                sortLargerDeq(std::deque<Pair>& pairs);
-        int                 binarySearchDeq(int value, int start, int end);
-        void                binaryInsertDeq(int value, int maxSearchIndex);
         void                buildMainChainDeq();
-        
+
         // helpers
-        void                generateJacobsthal();
-        std::vector<int>    buildInsertionOrder(int pairCount);
+        static std::vector<int> buildInsertionOrder(int totalPending);
         void                displayBefore();
         void                displayAfter();
         void                displayTiming();

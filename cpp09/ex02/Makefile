@@ -6,9 +6,9 @@ CXXFLAGS = -std=c++98 -Wall -Wextra -Werror
 OBJDIR = build
 
 # Source and output
-SRC = main.cpp RPN.cpp
+SRC = main.cpp PmergeMe.cpp
 OBJ = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRC))
-NAME = RPN
+NAME = PmergeMe
 
 # Default rule
 all: $(NAME)
