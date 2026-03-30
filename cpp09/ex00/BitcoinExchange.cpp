@@ -86,7 +86,7 @@ ValueError BitcoinExchange::isValidValue(const std::string &value, double &resul
 
 void BitcoinExchange::loadDatabase(const std::string &filename)
 {
-    std::ifstream DataBase(filename);
+    std::ifstream DataBase(filename.c_str());
     if (!DataBase.is_open())
         throw std::runtime_error("Error: could not open database file.");
     
@@ -117,7 +117,7 @@ double BitcoinExchange::getExchangeRate(const std::string &date) const
 
 void BitcoinExchange::processInputFile(const std::string &filename)
 {
-    std::ifstream InputFile(filename);
+    std::ifstream InputFile(filename.c_str());
     if (!InputFile.is_open())
         throw std::runtime_error("Error: could not open file.");
     
