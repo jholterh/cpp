@@ -157,10 +157,11 @@ void                    PmergeMe::sortLargerVec(std::vector<Pair>& pairs)
         std::vector<int> insertionShifts(winners.size(), 0);
         for (int k = 0; k < (int)insertOrder.size(); k++)
         {
-            int pendingIdx = insertOrder[k]; // 1-based pending index
+            int pendingIdx = insertOrder[k];
             Pair toInsert;
             int searchHi;
-
+            
+            // check if straggler
             if (pendingIdx <= numLosers - 1)
             {
                 toInsert = sortedLosers[pendingIdx];
@@ -171,7 +172,7 @@ void                    PmergeMe::sortLargerVec(std::vector<Pair>& pairs)
                 toInsert = oddPair;
                 searchHi = (int)chain.size() - 1;
             }
-
+            // merge insert
             int searchLo = 0;
             while (searchHi >= searchLo)
             {
@@ -182,6 +183,7 @@ void                    PmergeMe::sortLargerVec(std::vector<Pair>& pairs)
                     searchLo = mid + 1;
             }
             chain.insert(chain.begin() + searchLo, toInsert);
+            // add shift
             for (int i = 0; i < (int)winners.size(); i++)
             {
                 if (i + 1 + insertionShifts[i] >= searchLo)
@@ -209,7 +211,7 @@ void PmergeMe::buildMainChainVec()
         std::vector<int> insertionShifts(_vecPairs.size(), 0);
         for (int k = 0; k < (int)insertOrder.size(); k++)
         {
-            int pendingIdx = insertOrder[k]; // 1-based pending index
+            int pendingIdx = insertOrder[k];
             int value;
             int searchHi;
 
@@ -260,7 +262,7 @@ void PmergeMe::sortVec()
     _vec_time = static_cast<double>(end - start) / CLOCKS_PER_SEC * 1000000;
 }
 
-// === Deque pipeline ===
+// Deque pipeline
 
 bool                    PmergeMe::compareDeq(int a, int b)
 {
